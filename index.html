@@ -102,4 +102,369 @@
                         <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_froid" class="phenomenon-checkbox" data-verb="perçu"><label for="pheno_froid">Point froid soudain</label></div></div>
                         <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_chaleur" class="phenomenon-checkbox" data-verb="perçu"><label for="pheno_chaleur">Vague de chaleur inexpliquée</label></div></div>
                         <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_souffle" class="phenomenon-checkbox" data-verb="ressenti"><label for="pheno_souffle">Sensation de souffle (froid ou chaud)</label></div></div>
-                        <div class="phen
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_thermique_autre" class="phenomenon-checkbox is-other" data-verb="perçu"><label for="pheno_thermique_autre">Autre</label><input type="text" class="other-input hidden" placeholder="Décrivez le changement de température..."></div></div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Phénomènes Olfactifs</legend>
+                    <p class="fieldset-prompt">Titre 1.5. Phénomènes Olfactifs : Avez-vous senti une odeur inhabituelle sans source apparente ?</p>
+                    <div class="choices-container">
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_parfum" class="phenomenon-checkbox" data-verb="senti"><label for="pheno_parfum">Parfum floral</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_soufre" class="phenomenon-checkbox" data-verb="senti"><label for="pheno_soufre">Soufre</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_tabac" class="phenomenon-checkbox" data-verb="senti"><label for="pheno_tabac">Tabac</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_nourriture" class="phenomenon-checkbox" data-verb="senti"><label for="pheno_nourriture">Nourriture</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_nauseabonde" class="phenomenon-checkbox" data-verb="senti"><label for="pheno_nauseabonde">Odeur nauséabonde</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_olfactif_autre" class="phenomenon-checkbox is-other" data-verb="senti"><label for="pheno_olfactif_autre">Autre</label><input type="text" class="other-input hidden" placeholder="Décrivez l'odeur..."></div></div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Phénomènes Technologiques</legend>
+                     <p class="fieldset-prompt">Titre 1.6. Phénomènes Technologiques : Avez-vous observé une perturbation inhabituelle d’appareils électroniques ou électriques ?</p>
+                    <div class="choices-container">
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_lumiere_clignote" class="phenomenon-checkbox" data-verb="observé"><label for="pheno_lumiere_clignote">Lumières qui clignotent</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_appareil_seul" class="phenomenon-checkbox" data-verb="observé"><label for="pheno_appareil_seul">Appareil qui s’allume ou s’éteint tout seul</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_batterie" class="phenomenon-checkbox" data-verb="observé"><label for="pheno_batterie">Batterie qui se vide subitement</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_interference" class="phenomenon-checkbox" data-verb="observé"><label for="pheno_interference">Interférences audio/vidéo</label></div></div>
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_tech_autre" class="phenomenon-checkbox is-other" data-verb="observé"><label for="pheno_tech_autre">Autre</label><input type="text" class="other-input hidden" placeholder="Décrivez la perturbation..."></div></div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Phénomènes d'Emprise</legend>
+                     <p class="fieldset-prompt">Titre 1.7. Phénomènes d'Emprise ou de Contrôle : Avez-vous ressenti une perte de contrôle ?</p>
+                    <div class="choices-container">
+                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_possession" class="phenomenon-checkbox" data-verb="subi"><label for="pheno_possession">Possession (sentiment d’invasion, dialogues intérieurs imposés, contrôle des mouvements, perte de contrôle, colère...)</label></div></div>
+                    </div>
+                </fieldset>
+            </div>
+            
+            <div id="wizard-controls">
+                <button type="button" id="start-detailing-btn" class="action-button" disabled>Prêt à décrire l'intensité</button>
+            </div>
+            
+            <div id="summary-container" class="hidden"></div>
+        </form>
+    </div>
+    
+    <template id="intensity-template">
+        <div class="wizard-step-wrapper">
+            <div class="wizard-section intensity-section">
+                <p><strong>Axe 2 : Avec quelle intensité ce phénomène s’est-il produit ?</strong></p>
+                <div class="wizard-level"><input type="radio" id="level1_{id}" name="intensity_{id}" value="1"><label for="level1_{id}">Niveau 1 (Subtil)</label><textarea class="description-input" placeholder="Décrivez votre expérience..."></textarea></div>
+                <div class="wizard-level"><input type="radio" id="level2_{id}" name="intensity_{id}" value="2"><label for="level2_{id}">Niveau 2 (Observable)</label><textarea class="description-input" placeholder="Décrivez votre expérience..."></textarea></div>
+                <div class="wizard-level"><input type="radio" id="level3_{id}" name="intensity_{id}" value="3"><label for="level3_{id}">Niveau 3 (Interactif léger)</label><textarea class="description-input" placeholder="Décrivez l'interaction..."></textarea></div>
+                <div class="wizard-level"><input type="radio" id="level4_{id}" name="intensity_{id}" value="4"><label for="level4_{id}">Niveau 4 (Agressif)</label><textarea class="description-input" placeholder="Décrivez l'action..."></textarea></div>
+                <div class="wizard-level"><input type="radio" id="level5_{id}" name="intensity_{id}" value="5"><label for="level5_{id}">Niveau 5 (Dominant)</label><textarea class="description-input" placeholder="Décrivez la scène..."></textarea></div>
+            </div>
+        </div>
+    </template>
+    <template id="scope-frequency-template">
+        <div class="wizard-step-wrapper">
+            <div class="wizard-section scope-frequency-wrapper">
+                <div class="sf-section">
+                    <p><strong>Axe 3.1 : Quelle était la portée spatiale ?</strong></p>
+                    <div class="wizard-level"><input type="radio" name="scope_{id}" value="Ponctuelle"><label>Ponctuelle</label></div>
+                    <div class="wizard-level"><input type="radio" name="scope_{id}" value="Localisée"><label>Localisée</label></div>
+                    <div class="wizard-level"><input type="radio" name="scope_{id}" value="Étendue"><label>Étendue</label></div>
+                    <div class="wizard-level"><input type="radio" name="scope_{id}" value="Personnelle"><label>Personnelle</label></div>
+                </div>
+                <div class="sf-section">
+                    <p><strong>Axe 3.2 : Quelle était sa fréquence ?</strong></p>
+                    <div class="wizard-level"><input type="radio" name="frequency_{id}" value="Unique"><label>Unique</label></div>
+                    <div class="wizard-level"><input type="radio" name="frequency_{id}" value="Sporadique"><label>Sporadique</label></div>
+                    <div class="wizard-level"><input type="radio" name="frequency_{id}" value="Cyclique"><label>Cyclique</label></div>
+                    <div class="wizard-level"><input type="radio" name="frequency_{id}" value="Continu / Escalatoire"><label>Continu / Escalatoire</label></div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="intelligence-template">
+        <div class="wizard-step-wrapper">
+            <div class="wizard-section intelligence-wrapper">
+                <p><strong>Axe 4 : Quel niveau de conscience le phénomène semble-t-il manifester ?</strong></p>
+                <div class="wizard-level"><input type="radio" name="intelligence_{id}" value="Non-conscient et non-réactif"><label>Non-conscient (Répétition)</label></div>
+                <div class="wizard-level"><input type="radio" name="intelligence_{id}" value="Conscience simple et Réactif"><label>Réactif (Simple)</label></div>
+                <div class="wizard-level"><input type="radio" name="intelligence_{id}" value="Conscience intelligente"><label>Intelligent (Cohérent)</label></div>
+                <div class="wizard-level"><input type="radio" name="intelligence_{id}" value="Haute conscience et Manipulateur"><label>Manipulateur</label></div>
+                <div class="wizard-level"><input type="radio" name="intelligence_{id}" value="Autre"><label>Autre...</label><textarea class="description-input hidden" placeholder="Décrivez le comportement..."></textarea></div>
+            </div>
+        </div>
+    </template>
+    <template id="impact-template">
+        <div class="wizard-step-wrapper">
+            <div class="wizard-section impact-wrapper">
+                <p><strong>Axe 5 : Quel a été l'impact émotionnel sur vous ?</strong></p>
+                <div class="wizard-level"><input type="radio" name="impact_{id}" value="Positif / Réconfortant"><label>Positif / Réconfortant</label></div>
+                <div class="wizard-level"><input type="radio" name="impact_{id}" value="Neutre / Curieux"><label>Neutre / Curieux</label></div>
+                <div class="wizard-level"><input type="radio" name="impact_{id}" value="Confusion / Anxiogène"><label>Confusion / Anxiogène</label></div>
+                <div class="wizard-level"><input type="radio" name="impact_{id}" value="Négatif / Effrayant"><label>Négatif / Effrayant</label></div>
+                <div class="wizard-level"><input type="radio" name="impact_{id}" value="Terrifiant / Oppressant"><label>Terrifiant / Oppressant</label></div>
+                <div class="wizard-level"><input type="radio" name="impact_{id}" value="Possession"><label>Possession (Sentiment de contrôle externe)</label></div>
+            </div>
+        </div>
+    </template>
+    <template id="live-score-template">
+        <div class="live-score-display">Indice Spécifique : <span>0.000</span></div>
+    </template>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Initialisation et Constantes ---
+        const form = document.getElementById('paranormal-form');
+        const startBtn = document.getElementById('start-detailing-btn');
+        const templates = {
+            intensity: document.getElementById('intensity-template'),
+            scope: document.getElementById('scope-frequency-template'),
+            intelligence: document.getElementById('intelligence-template'),
+            impact: document.getElementById('impact-template'),
+            liveScore: document.getElementById('live-score-template')
+        };
+        const summaryContainer = document.getElementById('summary-container');
+        const phase1Container = document.getElementById('phase-1-selection');
+        const wizardControls = document.getElementById('wizard-controls');
+        let summaryData = [];
+    
+        const scores = {
+            intensity: { '1': -0.2, '2': -0.5, '3': -1.0, '4': -1.5, '5': -2.0 },
+            scope: { 'Ponctuelle': -0.5, 'Localisée': -0.5, 'Étendue': -1.0, 'Personnelle': -1.0 },
+            frequency: { 'Unique': -0.2, 'Sporadique': -0.5, 'Cyclique': -0.5, 'Continu / Escalatoire': -1.0 },
+            intelligence: { 'Non-conscient et non-réactif': -0.2, 'Conscience simple et Réactif': -0.5, 'Conscience intelligente': -1.5, 'Haute conscience et Manipulateur': -2.5, 'Autre': -1.0 },
+            impact: { 'Positif / Réconfortant': -0.1, 'Neutre / Curieux': -0.5, 'Confusion / Anxiogène': -1.5, 'Négatif / Effrayant': -2.5, 'Terrifiant / Oppressant': -3.5, 'Possession': -4.5 }
+        };
+        const weights = { intensity: 0.20, scope: 0.10, intelligence: 0.30, impact: 0.40 };
+    
+        // --- PHASE 1 ---
+        form.addEventListener('change', (e) => {
+            if (e.target.classList.contains('phenomenon-checkbox')) {
+                startBtn.disabled = !form.querySelector('.phenomenon-checkbox:checked');
+                if (e.target.classList.contains('is-other')) {
+                    e.target.closest('.phenomenon-header').querySelector('.other-input')?.classList.toggle('hidden', !e.target.checked);
+                }
+            }
+        });
+        startBtn.addEventListener('click', startWizard);
+    
+        // --- PHASE 2 : ASSISTANT GUIDÉ ---
+        function startWizard() {
+            form.querySelectorAll('.phenomenon-choice').forEach(choice => {
+                if (choice.querySelector('.phenomenon-checkbox').checked) {
+                    choice.dataset.status = 'pending';
+                    form.appendChild(choice);
+                }
+            });
+            phase1Container.classList.add('hidden');
+            wizardControls.classList.add('hidden');
+            processNextPhenomenon();
+        }
+    
+        function processNextPhenomenon() {
+            const nextPhenomenon = form.querySelector('.phenomenon-choice[data-status="pending"]');
+            document.querySelectorAll('.is-sticky').forEach(el => el.classList.remove('is-sticky'));
+            if (!nextPhenomenon) {
+                displaySummary();
+                return;
+            }
+            
+            nextPhenomenon.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            const header = nextPhenomenon.querySelector('.phenomenon-header');
+            header.classList.add('is-sticky');
+    
+            if (!nextPhenomenon.querySelector('.live-score-display')) {
+                const liveScoreEl = templates.liveScore.content.cloneNode(true).firstElementChild;
+                header.insertAdjacentElement('afterend', liveScoreEl);
+                liveScoreEl.classList.add('is-sticky');
+            }
+            setupIntensityValidation(nextPhenomenon);
+        }
+        
+        // --- Chaîne de validation ---
+        function setupIntensityValidation(phenomenonEl) {
+            injectTemplate(phenomenonEl, 'intensity');
+            phenomenonEl.querySelectorAll('input[name^="intensity_"]').forEach(radio => radio.addEventListener('change', () => {
+                updateLiveScore(phenomenonEl);
+                if (!phenomenonEl.querySelector('.validate-intensity-btn')) {
+                    createValidationButton(phenomenonEl, "Valider l'Intensité", 'validate-intensity-btn', () => {
+                        phenomenonEl.querySelectorAll('.wizard-level:has(input[name^="intensity_"]:not(:checked))').forEach(el => el.classList.add('hidden'));
+                        setupScopeFrequencyValidation(phenomenonEl);
+                    });
+                }
+            }));
+        }
+        
+        function setupScopeFrequencyValidation(phenomenonEl) {
+            injectTemplate(phenomenonEl, 'scope', '.wizard-step-wrapper');
+            phenomenonEl.querySelector('.scope-frequency-wrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const validationCheck = () => {
+                updateLiveScore(phenomenonEl);
+                if (phenomenonEl.querySelector('input[name^="scope_"]:checked') && phenomenonEl.querySelector('input[name^="frequency_"]:checked') && !phenomenonEl.querySelector('.validate-scope-btn')) {
+                     createValidationButton(phenomenonEl, "Valider Portée/Fréquence", 'validate-scope-btn', () => {
+                        phenomenonEl.querySelectorAll('.wizard-level:has(input[name^="scope_"]:not(:checked)), .wizard-level:has(input[name^="frequency_"]:not(:checked))').forEach(el => el.classList.add('hidden'));
+                        setupIntelligenceValidation(phenomenonEl);
+                    });
+                }
+            };
+            phenomenonEl.querySelectorAll('input[name^="scope_"], input[name^="frequency_"]').forEach(radio => radio.addEventListener('change', validationCheck));
+        }
+        
+        function setupIntelligenceValidation(phenomenonEl) {
+            injectTemplate(phenomenonEl, 'intelligence', '.scope-frequency-wrapper');
+            phenomenonEl.querySelector('.intelligence-wrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            phenomenonEl.querySelectorAll('input[name^="intelligence_"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                     updateLiveScore(phenomenonEl);
+                     e.target.closest('.wizard-level').querySelector('textarea')?.classList.toggle('hidden', e.target.value !== 'Autre');
+                     
+                    if (!phenomenonEl.querySelector('.validate-intelligence-btn')) {
+                         createValidationButton(phenomenonEl, "Valider le Niveau de Conscience", 'validate-intelligence-btn', () => {
+                            phenomenonEl.querySelectorAll('.wizard-level:has(input[name^="intelligence_"]:not(:checked))').forEach(el => el.classList.add('hidden'));
+                            setupImpactValidation(phenomenonEl);
+                        });
+                    }
+                });
+            });
+        }
+    
+        function setupImpactValidation(phenomenonEl) {
+            injectTemplate(phenomenonEl, 'impact', '.intelligence-wrapper');
+            phenomenonEl.querySelector('.impact-wrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            phenomenonEl.querySelectorAll('input[name^="impact_"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    updateLiveScore(phenomenonEl);
+                    if (!phenomenonEl.querySelector('.validate-impact-btn')) {
+                        createValidationButton(phenomenonEl, "Valider le phénomène et passer au suivant", 'validate-impact-btn', () => {
+                            phenomenonEl.dataset.status = 'done';
+                            collectAllData(phenomenonEl);
+                            processNextPhenomenon();
+                        });
+                    }
+                });
+            });
+        }
+    
+        // --- Fonctions Utilitaires ---
+        function injectTemplate(phenomenonEl, templateName, afterSelector = '.live-score-display') {
+            const wrapperSelector = `.wizard-step-wrapper:has(.${templateName}-section)`;
+            if (!phenomenonEl.querySelector(wrapperSelector)) {
+                const checkboxId = phenomenonEl.querySelector('.phenomenon-checkbox').id;
+                const templateContent = templates[templateName].innerHTML.replace(/{id}/g, checkboxId);
+                phenomenonEl.querySelector(afterSelector).insertAdjacentHTML('afterend', templateContent);
+            }
+        }
+    
+        function createValidationButton(phenomenonEl, text, className, onClickAction) {
+            phenomenonEl.querySelector(`.${className}`)?.remove();
+            const validateBtn = document.createElement('button');
+            validateBtn.type = 'button';
+            validateBtn.textContent = text;
+            validateBtn.className = `action-button ${className} validate-step-btn`;
+            phenomenonEl.appendChild(validateBtn);
+            validateBtn.addEventListener('click', () => {
+                validateBtn.remove();
+                onClickAction();
+            });
+        }
+    
+        function updateLiveScore(phenomenonEl) {
+            const scoreDisplay = phenomenonEl.querySelector('.live-score-display span');
+            if (!scoreDisplay) return;
+    
+            const getScore = (axis, name) => {
+                const radio = phenomenonEl.querySelector(`input[name^="${name}"]:checked`);
+                if (!radio) return 0;
+                let value = radio.value;
+                if (name === 'intelligence_' && value === 'Autre') return scores.intelligence['Autre'];
+                return scores[axis][value] || 0;
+            };
+    
+            const scoreIntensity = getScore('intensity', 'intensity_');
+            const scoreScope = getScore('scope', 'scope_');
+            const scoreFrequency = getScore('frequency', 'frequency_');
+            const scoreAxe3 = (scoreScope + scoreFrequency) / 2;
+            const scoreIntelligence = getScore('intelligence', 'intelligence_');
+            const scoreImpact = getScore('impact', 'impact_');
+            
+            const isms = (scoreIntensity * weights.intensity) + (scoreAxe3 * weights.scope) + (scoreIntelligence * weights.intelligence) + (scoreImpact * weights.impact);
+            phenomenonEl.dataset.isms = isms;
+            scoreDisplay.textContent = isms.toFixed(3);
+        }
+        
+        function collectAllData(phenomenonEl) {
+            let intelligenceRadio = phenomenonEl.querySelector('input[name^="intelligence_"]:checked');
+            let intelligenceValue = intelligenceRadio.value;
+            if (intelligenceValue === 'Autre') {
+               const otherDesc = intelligenceRadio.closest('.wizard-level').querySelector('textarea').value.trim();
+               if(otherDesc) intelligenceValue = `Autre : ${otherDesc}`;
+            }
+            
+            const dataPoint = {
+                phenomenonLabel: phenomenonEl.querySelector('.phenomenon-header label').textContent.trim(),
+                isms: parseFloat(phenomenonEl.dataset.isms || 0)
+            };
+            const otherInput = phenomenonEl.querySelector('.other-input');
+            if(otherInput && otherInput.value.trim() !== '') {
+                dataPoint.phenomenonLabel = otherInput.value.trim();
+            }
+            summaryData.push(dataPoint);
+        }
+        
+        async function displaySummary() {
+            const igms = summaryData.length > 0 ? summaryData.reduce((acc, item) => acc + item.isms, 0) / summaryData.length : 0;
+            
+            let summaryHTML = '<h2>Bilan de votre expérience</h2>';
+            summaryHTML += `<h3>Indice Global des Manifestations Spirituelles (IGMS) : <strong>${igms.toFixed(3)}</strong></h3>`;
+            
+            let ismsCalcParts = summaryData.map(item => `${item.isms.toFixed(3)} (${item.phenomenonLabel.split('(')[0].trim()})`);
+            summaryHTML += `<p class="calculation">IGMS = (${ismsCalcParts.join(' + ')}) / ${summaryData.length}</p>`;
+            
+            const zone = getZone(igms);
+            const maxNegativeScore = 4.5;
+            const percent = Math.min(100, (Math.abs(igms) / maxNegativeScore) * 100);
+            summaryHTML += `
+                <div class="thermometer-container">
+                    <div class="thermometer-fill" style="width: ${percent}%; background-color: ${zone.color};">${zone.name}</div>
+                </div>`;
+            
+            summaryHTML += `
+                <div class="diagnostic-box" style="border-left-color: ${zone.color}; background-color: ${zone.bgColor};">
+                    <h3>Diagnostic Global : ${zone.name}</h3>
+                    <p><strong>Description :</strong> ${zone.diagnostic}</p>
+                    <p><strong>Recommandations :</strong> ${zone.recommendation}</p>
+                </div>`;
+            
+            summaryHTML += `<hr><h2>Analyse Détaillée par l'IA</h2><div id="ai-analysis-box" class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;"><p>Analyse en cours, veuillez patienter...</p></div>`;
+
+            summaryContainer.innerHTML = summaryHTML;
+            summaryContainer.classList.remove('hidden');
+            summaryContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            try {
+                const response = await fetch('/api/analyser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ summaryData: summaryData })
+                });
+                const aiBox = document.getElementById('ai-analysis-box');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Erreur du serveur (status ${response.status}): ${errorData.message || 'Aucun détail'}`);
+                }
+                const data = await response.json();
+                aiBox.innerHTML = data.analysis;
+            } catch (error) {
+                console.error("Erreur lors de l'appel à l'IA:", error);
+                document.getElementById('ai-analysis-box').innerHTML = `<p>Désolé, une erreur est survenue lors de la génération de l'analyse par l'IA : ${error.message}</p>`;
+            }
+        }
+    
+        function getZone(score) {
+            if (score > -0.5) return { name: 'Manifestations Bénignes', color: '#17a2b8', bgColor: '#e8f7fa', diagnostic: "Présence d'une énergie neutre ou positive.", recommendation: "Observer avec sérénité. Pas d'action requise si le ressenti est positif." };
+            if (score > -1.5) return { name: 'Anomalie Spirituelle', color: '#ffc107', bgColor: '#fff9e6', diagnostic: "Activité résiduelle ou conscience simple. Angoissante mais pas une menace directe.", recommendation: "Documenter précisément les événements. Éviter la provocation." };
+            if (score > -2.5) return { name: 'Activité Hostile', color: '#fd7e14', bgColor: '#fff2e8', diagnostic: "Entité consciente et hostile. La situation est sérieuse.", recommendation: "Chercher du soutien (spirituel, psychologique). Mesures de protection recommandées." };
+            if (score > -3.5) return { name: 'Crise Spirituelle Majeure', color: '#dc3545', bgColor: '#fbe9eb', diagnostic: "Forte suspicion d'infestation par une entité malveillante. Danger élevé.", recommendation: "Ne pas gérer cela seul. Consulter des spécialistes reconnus est fortement recommandé." };
+            return { name: 'Danger Spirituel Critique', color: '#212529', bgColor: '#e9ecef', diagnostic: "Symptômes d'oppression sévère ou de possession. Danger critique.", recommendation: "Situation d'urgence. L'aide d'une autorité religieuse compétente est la seule recommandation appropriée." };
+        }
+    });
+    </script>
+    
+    </body>
+    </html>
