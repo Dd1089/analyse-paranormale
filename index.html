@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Outil d'Analyse (Test Simplifié)</title>
     <style>
-        /* Le CSS reste identique, il est nécessaire pour l'affichage */
         html { scroll-behavior: smooth; }
         body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #212529; margin: 0; padding: 20px 20px 120px 20px; }
         .container { max-width: 850px; margin: auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
@@ -18,6 +17,7 @@
         .live-score-display.is-sticky { position: sticky; top: 75px; z-index: 99; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .phenomenon-choice[data-status="pending"] { border-color: #007bff; }
         .phenomenon-choice[data-status="done"] { background-color: #d4edda; border-color: #c3e6cb; }
+        .phenomenon-choice[data-status="done"] .phenomenon-header.is-sticky { border-bottom-color: #28a745; }
         .wizard-step-wrapper { padding: 0 12px 12px 12px; }
         .wizard-section { margin-top: 10px; padding: 20px; border-radius: 5px; border: 1px solid; }
         .intensity-section { background-color: #fff9db; border-color: #ffe066; }
@@ -40,134 +40,4 @@
         .calculation { font-family: 'Courier New', Courier, monospace; background: #e9ecef; padding: 10px; border-radius: 4px; font-size: 0.9em; margin-top: 10px; line-height: 1.8; word-wrap: break-word; }
         .thermometer-container { border: 1px solid #ccc; background: #e9ecef; padding: 4px; border-radius: 8px; margin-top: 10px; }
         .thermometer-fill { height: 25px; width: 0%; border-radius: 5px; transition: width 1s ease-out, background-color 1s ease-out; text-align: right; color: white; font-weight: bold; padding-right: 10px; line-height: 25px; box-sizing: border-box; }
-        .diagnostic-box { margin-top: 20px; padding: 20px; border-radius: 5px; border-left: 5px solid; }
-        .diagnostic-box h3, .diagnostic-box h4 { margin-top: 0; border: none; }
-        #ai-analysis-box { border-left-color: #6f42c1; background-color: #f3f0ff; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Outil d'Analyse Paranormale (Mode Test)</h1>
-        
-        <form id="paranormal-form" onsubmit="return false;">
-             <div id="phase-1-selection">
-                <p><strong>Étape 1 :</strong> Cochez tous les phénomènes que vous avez personnellement vécus.</p>
-                <fieldset>
-                    <legend>Phénomènes Auditifs</legend>
-                    <p class="fieldset-prompt">Titre 1.1. Phénomènes Auditifs : Avez-vous entendu quelque chose d'inhabituel ?</p>
-                    <div class="choices-container">
-                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_voix" class="phenomenon-checkbox" data-verb="entendu"><label for="pheno_voix">Voix (chuchotements...)</label></div></div>
-                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_bruits" class="phenomenon-checkbox" data-verb="entendu"><label for="pheno_bruits">Bruits (coups...)</label></div></div>
-                    </div>
-                </fieldset>
-                <fieldset>
-                    <legend>Phénomènes d'Emprise</legend>
-                    <p class="fieldset-prompt">Titre 1.7. Phénomènes d'Emprise ou de Contrôle : Avez-vous ressenti une perte de contrôle ?</p>
-                    <div class="choices-container">
-                        <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_possession" class="phenomenon-checkbox" data-verb="subi"><label for="pheno_possession">Possession (...)</label></div></div>
-                    </div>
-                </fieldset>
-             </div>
-             <div id="wizard-controls">
-                <button type="button" id="start-detailing-btn" class="action-button" disabled>Prêt à décrire l'intensité</button>
-             </div>
-        </form>
-
-        <div id="summary-container" class="hidden"></div>
-    </div>
-    
-    <template id="intensity-template">
-        <div class="wizard-step-wrapper">
-            <div class="wizard-section intensity-section">
-                <p><strong>Axe 2 : Intensité</strong></p>
-                <div class="wizard-level"><input type="radio" id="level1_{id}" name="intensity_{id}" value="1"><label>Niveau 1</label><textarea class="description-input"></textarea></div>
-                <div class="wizard-level"><input type="radio" id="level2_{id}" name="intensity_{id}" value="2"><label>Niveau 2</label><textarea class="description-input"></textarea></div>
-            </div>
-        </div>
-    </template>
-    <template id="scope-frequency-template">
-        <div class="wizard-step-wrapper"><div class="wizard-section scope-frequency-wrapper"><p><strong>Axe 3 : Portée/Fréquence</strong></p><div class="wizard-level"><input type="radio" name="scope_{id}" value="Ponctuelle"><label>Ponctuelle</label></div><div class="wizard-level"><input type="radio" name="frequency_{id}" value="Unique"><label>Unique</label></div></div></div>
-    </template>
-    <template id="intelligence-template">
-        <div class="wizard-step-wrapper"><div class="wizard-section intelligence-wrapper"><p><strong>Axe 4 : Intelligence</strong></p><div class="wizard-level"><input type="radio" name="intelligence_{id}" value="Non-conscient et non-réactif"><label>Non-conscient</label></div></div></div>
-    </template>
-    <template id="impact-template">
-        <div class="wizard-step-wrapper"><div class="wizard-section impact-wrapper"><p><strong>Axe 5 : Impact</strong></p><div class="wizard-level"><input type="radio" name="impact_{id}" value="Neutre / Curieux"><label>Neutre</label></div></div></div>
-    </template>
-    <template id="live-score-template">
-        <div class="live-score-display">Indice Spécifique : <span>0.000</span></div>
-    </template>
-    
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- Version simplifiée du script SANS authentification ---
-        const form = document.getElementById('paranormal-form');
-        const startBtn = document.getElementById('start-detailing-btn');
-        const templates = {
-            intensity: document.getElementById('intensity-template'),
-            scope: document.getElementById('scope-frequency-template'),
-            intelligence: document.getElementById('intelligence-template'),
-            impact: document.getElementById('impact-template'),
-            liveScore: document.getElementById('live-score-template')
-        };
-        const summaryContainer = document.getElementById('summary-container');
-        const phase1Container = document.getElementById('phase-1-selection');
-        const wizardControls = document.getElementById('wizard-controls');
-        let summaryData = [];
-
-        const scores = {
-            intensity: { '1': -0.2, '2': -0.5, '3': -1.0, '4': -1.5, '5': -2.0 },
-            scope: { 'Ponctuelle': -0.5, 'Localisée': -0.5, 'Étendue': -1.0, 'Personnelle': -1.0 },
-            frequency: { 'Unique': -0.2, 'Sporadique': -0.5, 'Cyclique': -0.5, 'Continu / Escalatoire': -1.0 },
-            intelligence: { 'Non-conscient et non-réactif': -0.2, 'Conscience simple et Réactif': -0.5, 'Conscience intelligente': -1.5, 'Haute conscience et Manipulateur': -2.5, 'Autre': -1.0 },
-            impact: { 'Positif / Réconfortant': -0.1, 'Neutre / Curieux': -0.5, 'Confusion / Anxiogène': -1.5, 'Négatif / Effrayant': -2.5, 'Terrifiant / Oppressant': -3.5, 'Possession': -4.5 }
-        };
-        const weights = { intensity: 0.20, scope: 0.10, intelligence: 0.30, impact: 0.40 };
-
-        form.addEventListener('change', (e) => {
-            if (e.target.classList.contains('phenomenon-checkbox')) {
-                startBtn.disabled = !form.querySelector('.phenomenon-checkbox:checked');
-            }
-        });
-        startBtn.addEventListener('click', startWizard);
-
-        function startWizard() {
-            form.querySelectorAll('.phenomenon-choice').forEach(choice => {
-                if (!choice.querySelector('.phenomenon-checkbox').checked) {
-                    choice.classList.add('hidden');
-                } else {
-                    choice.dataset.status = 'pending';
-                    form.appendChild(choice);
-                }
-            });
-            phase1Container.classList.add('hidden');
-            wizardControls.classList.add('hidden');
-            processNextPhenomenon();
-        }
-
-        function processNextPhenomenon() {
-            // Le reste de la logique du wizard reste la même...
-            // ... (setupIntensityValidation, setupScopeFrequencyValidation, etc.)
-            const nextPhenomenon = form.querySelector('.phenomenon-choice[data-status="pending"]');
-            if (!nextPhenomenon) {
-                displaySummary(); // Appel final
-                return;
-            }
-            nextPhenomenon.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            const header = nextPhenomenon.querySelector('.phenomenon-header');
-            header.classList.add('is-sticky');
-            if (!nextPhenomenon.querySelector('.live-score-display')) {
-                header.insertAdjacentHTML('afterend', templates.liveScore.content.cloneNode(true).firstElementChild.outerHTML);
-                nextPhenomenon.querySelector('.live-score-display').classList.add('is-sticky');
-            }
-            setupIntensityValidation(nextPhenomenon);
-        }
-        
-        // --- NOTE: Toutes les fonctions setup...Validation et les fonctions utilitaires sont ici ---
-        // Elles sont omises pour la lisibilité, mais elles sont identiques à la version précédente fonctionnelle.
-        // La seule fonction qui change est displaySummary
-        
-        async function displaySummary() {
-            const igms = summaryData.length > 0 ? summaryData.reduce((acc, item) => acc + item.isms, 0) / summaryData.length : 0;
-            let summaryHTML = `<h2>Bilan de votre expérience</h2><h3>Indice Global (IGMS) : <strong>${igms.toFixed(3)}</strong></h3>`;
-            // ... le reste de la construction du HTML
+        .diagnostic-box { margin-top: 20px; padding: 20px; border-radius: 5px; border-left: 5px solid;
