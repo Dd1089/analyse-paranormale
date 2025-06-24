@@ -181,15 +181,136 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // --- CONFIGURATION SUPABASE ---
-        // Remplacez les valeurs ci-dessous par VOS PROPRES clés que vous trouverez sur votre dashboard Supabase
         const SUPABASE_URL = 'VOTRE_URL_SUPABASE_ICI'; 
         const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON_PUBLIQUE_ICI';
-        // ---------------------------------
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- GESTION DES ÉLÉMENTS DU DOM ---
+        const authSection = document.getElementById('auth-section');
+        const userDashboard = document.getElementById('user-dashboard');
+        const userEmailSpan = document.getElementById('user-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const newAnalysisBtn = document.getElementById('new-analysis-btn');
+        const paranormalForm = document.getElementById('paranormal-form');
+        const summaryContainer = document.getElementById('summary-container');
+        const chatContainer = document.getElementById('chat-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const pastAnalysesList = document.getElementById('past-analyses-list');
+        const authError = document.getElementById('auth-error');
+
+        let currentUser = null;
+        let currentSummaryData = [];
+        let conversationHistory = []; 
+
+        // --- Logique de base (déjà présente) ---
+        // ... (collez ici tout le code des fonctions startWizard, processNextPhenomenon, setup...Validation, etc. que je vous ai déjà fourni) ...
+
+        // --- NOUVELLE LOGIQUE POUR LE CHAT ---
+        chatSendBtn.addEventListener('click', handleChatSubmit);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleChatSubmit();
+            }
+        });
+
+        async function handleChatSubmit() {
+            const userQuestion = chatInput.value.trim();
+            if (!userQuestion) return;
+
+            // Afficher le message de l'utilisateur
+            addMessageToChat('user', userQuestion);
+            chatInput.value = '';
+            chatInput.disabled = true;
+            chatSendBtn.disabled = true;
+
+            // Afficher un indicateur de chargement
+            addMessageToChat('assistant', '...');
+
+            try {
+                // Envoyer la question et l'historique au backend
+                const response = await fetch('/api/analyser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        summaryData: currentSummaryData, // Le bilan initial comme contexte
+                        conversationHistory: conversationHistory,
+                        userQuestion: userQuestion
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur du serveur: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                // Mettre à jour la réponse de l'IA
+                updateLastAssistantMessage(data.analysis);
+
+                // Ajouter les derniers échanges à l'historique
+                conversationHistory.push({ role: 'user', parts: [{ text: userQuestion }] });
+                conversationHistory.push({ role: 'model', parts: [{ text: data.analysis }] });
+
+            } catch (error) {
+                console.error("Erreur lors de la conversation avec l'IA:", error);
+                updateLastAssistantMessage("<p style='color:red;'>Désolé, une erreur est survenue.</p>");
+            } finally {
+                chatInput.disabled = false;
+                chatSendBtn.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        function addMessageToChat(role, htmlContent) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.style.marginBottom = '10px';
+            if (role === 'user') {
+                messageWrapper.innerHTML = `<p style="text-align:right; margin:0;"><strong>Vous :</strong><br>${htmlContent}</p>`;
+            } else {
+                messageWrapper.innerHTML = `<div class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;">${htmlContent}</div>`;
+            }
+            chatMessages.appendChild(messageWrapper);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll vers le bas
+        }
+
+        function updateLastAssistantMessage(htmlContent) {
+            const lastMessage = chatMessages.lastElementChild;
+            if (lastMessage) {
+                lastMessage.innerHTML = `<div class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;">${htmlContent}</div>`;
+            }
+        }
         
-        // Tout le reste du Javascript (plus de 500 lignes) gérant l'authentification, le questionnaire, et le chat irait ici.
-        // Pour la lisibilité de cette réponse, il est omis, mais il est la version fonctionnelle que nous avons développée.
+        // --- MODIFICATION DE LA FONCTION displaySummary ---
+        async function displaySummary() {
+            // ... (tout le code de displaySummary que vous aviez déjà) ...
+            
+            // À la fin de la fonction, juste après avoir affiché l'analyse de l'IA :
+            const aiBox = document.getElementById('ai-analysis-box');
+            try {
+                // ... (le code du fetch initial pour la première analyse) ...
+                const data = await response.json();
+                aiBox.innerHTML = data.analysis;
+
+                // --- NOUVEAU : Activer et initialiser le chat ---
+                conversationHistory = [
+                    { role: 'user', parts: [{ text: `Voici mon bilan : ${JSON.stringify(summaryData)}` }] },
+                    { role: 'model', parts: [{ text: data.analysis }] }
+                ];
+                currentSummaryData = summaryData; // Sauvegarder le bilan pour le contexte du chat
+                chatMessages.innerHTML = `<div class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;"><p><strong>Assistant IA :</strong> Ceci est votre analyse initiale. Si vous avez des questions pour l'approfondir, posez-les ci-dessous.</p></div>`;
+                chatContainer.classList.remove('hidden');
+
+            } catch (error) {
+                // ... (gestion de l'erreur) ...
+            }
+        }
+
+        // --- Le reste de votre code JavaScript complet (authentification, wizard, etc.) doit être ici ---
     </script>
 </body>
 </html>
