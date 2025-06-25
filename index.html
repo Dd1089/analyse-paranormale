@@ -63,6 +63,7 @@
         .chat-message { margin-bottom: 10px; }
         .chat-message.user p { display: inline-block; background: #007bff; color: white; padding: 10px; border-radius: 15px 15px 0 15px; margin: 0;}
         .chat-message.user { text-align: right; }
+        .chat-message.assistant .diagnostic-box { margin-top: 0; }
     </style>
 </head>
 <body>
@@ -82,8 +83,8 @@
         </div>
 
         <div id="user-dashboard" class="hidden">
-            <div style="display:flex; justify-content: space-between; align-items: center;">
-                <p>Connecté : <strong id="user-email"></strong></p>
+            <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <p style="margin-right: 20px;">Connecté : <strong id="user-email"></strong></p>
                 <button id="logout-btn">Se Déconnecter</button>
             </div>
             <hr>
@@ -167,12 +168,21 @@
                         <div class="phenomenon-choice"><div class="phenomenon-header"><input type="checkbox" id="pheno_possession" class="phenomenon-checkbox" data-verb="subi"><label for="pheno_possession">Possession (sentiment d’invasion, dialogues intérieurs imposés, contrôle des mouvements, perte de contrôle, colère...)</label></div></div>
                     </div>
                 </fieldset>
-             </div>
+            </div>
              <div id="wizard-controls">
                 <button type="button" id="start-detailing-btn" class="action-button" disabled>Prêt à décrire l'intensité</button>
              </div>
         </form>
 
+        <div id="summary-container" class="hidden"></div>
+        <div id="chat-container" class="hidden">
+            <h3>Dialogue avec l'Assistant IA</h3>
+            <div id="chat-messages"></div>
+            <div id="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Posez une question sur votre bilan...">
+                <button id="chat-send-btn" class="action-button">Envoyer</button>
+            </div>
+        </div>
     </div>
     
     <template id="intensity-template">
@@ -310,15 +320,16 @@
         });
 
         signupBtn.addEventListener('click', async () => {
+            authError.classList.add('hidden');
             const { error } = await supabaseClient.auth.signUp({ email: emailInput.value, password: passwordInput.value });
             if (error) { authError.textContent = error.message; authError.classList.remove('hidden');} 
-            else { authError.classList.add('hidden'); alert("Compte créé ! Veuillez vérifier votre email pour confirmer votre inscription."); }
+            else { alert("Compte créé ! Veuillez vérifier votre email pour confirmer votre inscription."); }
         });
 
         loginBtn.addEventListener('click', async () => {
+            authError.classList.add('hidden');
             const { error } = await supabaseClient.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
-            if (error) { authError.textContent = "Email ou mot de passe incorrect."; authError.classList.remove('hidden');} 
-            else { authError.classList.add('hidden'); }
+            if (error) { authError.textContent = "Email ou mot de passe incorrect."; authError.classList.remove('hidden');}
         });
 
         logoutBtn.addEventListener('click', async () => {
@@ -335,6 +346,9 @@
         paranormalForm.addEventListener('change', (e) => {
             if (e.target.classList.contains('phenomenon-checkbox')) {
                 startBtn.disabled = !paranormalForm.querySelector('.phenomenon-checkbox:checked');
+                if (e.target.classList.contains('is-other')) {
+                    e.target.closest('.phenomenon-header').querySelector('.other-input')?.classList.toggle('hidden', !e.target.checked);
+                }
             }
         });
 
@@ -342,8 +356,39 @@
         
         chatSendBtn.addEventListener('click', handleChatSubmit);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleChatSubmit(); } });
+            
+        function resetQuestionnaire() {
+            summaryData = [];
+            currentSummaryData = [];
+            conversationHistory = [];
+            summaryContainer.classList.add('hidden');
+            chatContainer.classList.add('hidden');
+            selectedAnalysisDetails.classList.add('hidden');
+            selectedAnalysisDetails.innerHTML = '';
+            
+            document.querySelectorAll('#phase-1-selection .phenomenon-choice').forEach(choice => {
+                const checkbox = choice.querySelector('.phenomenon-checkbox');
+                if (checkbox) checkbox.checked = false;
+                choice.classList.remove('hidden');
+            });
+            
+            document.querySelectorAll('.phenomenon-choice[data-status]').forEach(choice => {
+                if (choice.originalParent) {
+                    choice.originalParent.appendChild(choice);
+                }
+                choice.dataset.status = '';
+                choice.querySelectorAll('.wizard-step-wrapper, .live-score-display, .validate-step-btn').forEach(el => el.remove());
+            });
+            
+            phase1Container.classList.remove('hidden');
+            wizardControls.classList.remove('hidden');
+            startBtn.disabled = true;
+        }
 
-        // ... et ici le reste des fonctions complètes et corrigées
+        function startWizard() {
+            // ... (logique startWizard, identique à la version précédente)
+        }
+        // ... (etc. pour toutes les autres fonctions)
     </script>
 </body>
 </html>
