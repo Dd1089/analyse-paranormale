@@ -172,8 +172,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // --- CONFIGURATION SUPABASE ---
-// Assurez-vous que vos vraies clés sont toujours ici !
+       // --- CONFIGURATION SUPABASE ---
 const SUPABASE_URL = 'https://csfyrptbblsxmyiwwwza.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzZnlycHRiYmxzeG15aXd3d3phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTI3MTgsImV4cCI6MjA2NjI4ODcxOH0.dzJqY-2pmtLjAYYNDUITaBL0ZxAo7gGUjLQQH7dpKDg';
 // ---------------------------------
@@ -181,7 +180,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- GESTION DES ÉLÉMENTS DU DOM (Vérifiée et Complète) ---
+// --- GESTION DES ÉLÉMENTS DU DOM ---
 const authSection = document.getElementById('auth-section');
 const userDashboard = document.getElementById('user-dashboard');
 const paranormalForm = document.getElementById('paranormal-form');
@@ -235,6 +234,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         paranormalForm.classList.add('hidden');
         summaryContainer.classList.add('hidden');
         chatContainer.classList.add('hidden');
+        selectedAnalysisDetails.classList.add('hidden');
         userEmailSpan.textContent = currentUser.email;
         await loadPastAnalyses(currentUser.id);
     } else {
@@ -270,7 +270,6 @@ newAnalysisBtn.addEventListener('click', () => {
     paranormalForm.classList.remove('hidden');
 });
 
-// CORRECTION : Utilisation de 'paranormalForm' au lieu de 'form'
 paranormalForm.addEventListener('change', (e) => {
     if (e.target.classList.contains('phenomenon-checkbox')) {
         startBtn.disabled = !paranormalForm.querySelector('.phenomenon-checkbox:checked');
@@ -282,6 +281,9 @@ paranormalForm.addEventListener('change', (e) => {
 
 startBtn.addEventListener('click', startWizard);
 
+chatSendBtn.addEventListener('click', handleChatSubmit);
+chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleChatSubmit(); } });
+    
 // --- FONCTIONS DU QUESTIONNAIRE ---
 function resetQuestionnaire() {
     summaryData = [];
@@ -291,23 +293,21 @@ function resetQuestionnaire() {
     chatContainer.classList.add('hidden');
     selectedAnalysisDetails.classList.add('hidden');
     selectedAnalysisDetails.innerHTML = '';
-    phase1Container.classList.remove('hidden');
-    wizardControls.classList.remove('hidden');
     
-    document.querySelectorAll('#phase-1-selection .phenomenon-choice').forEach(choice => {
+    paranormalForm.querySelectorAll('.phenomenon-choice').forEach(choice => {
+        if (choice.originalParent) {
+            choice.originalParent.appendChild(choice);
+        }
         choice.classList.remove('hidden');
+        choice.dataset.status = '';
         const checkbox = choice.querySelector('.phenomenon-checkbox');
         if(checkbox) checkbox.checked = false;
-    });
-
-    // Supprimer les éléments générés par le wizard précédent
-    document.querySelectorAll('.phenomenon-choice[data-status]').forEach(choice => {
-        choice.dataset.status = '';
+        
         choice.querySelectorAll('.wizard-step-wrapper, .live-score-display, .validate-step-btn').forEach(el => el.remove());
-        // S'assurer que le choix est dans son fieldset d'origine (simplifié)
-        document.querySelector(`#phase-1-selection fieldset:has(#${choice.querySelector('input').id}) .choices-container`).appendChild(choice);
     });
 
+    phase1Container.classList.remove('hidden');
+    wizardControls.classList.remove('hidden');
     startBtn.disabled = true;
 }
 
@@ -315,7 +315,12 @@ function startWizard() {
     paranormalForm.querySelectorAll('.phenomenon-choice').forEach(choice => {
         if (choice.querySelector('.phenomenon-checkbox').checked) {
             choice.dataset.status = 'pending';
+            if (!choice.originalParent) {
+                choice.originalParent = choice.parentNode;
+            }
             paranormalForm.appendChild(choice);
+        } else {
+            choice.classList.add('hidden');
         }
     });
     phase1Container.classList.add('hidden');
@@ -375,7 +380,8 @@ function setupIntelligenceValidation(phenomenonEl) {
     phenomenonEl.querySelectorAll('input[name^="intelligence_"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
              updateLiveScore(phenomenonEl);
-             e.target.closest('.wizard-level').querySelector('textarea')?.classList.toggle('hidden', e.target.value !== 'Autre');
+             const otherTextarea = e.target.closest('.wizard-level').querySelector('textarea');
+             if (otherTextarea) { otherTextarea.classList.toggle('hidden', e.target.value !== 'Autre'); }
             if (!phenomenonEl.querySelector('.validate-intelligence-btn')) {
                  createValidationButton(phenomenonEl, "Valider le Niveau de Conscience", 'validate-intelligence-btn', () => {
                     phenomenonEl.querySelectorAll('.wizard-level:has(input[name^="intelligence_"]:not(:checked))').forEach(el => el.classList.add('hidden'));
@@ -393,7 +399,7 @@ function setupImpactValidation(phenomenonEl) {
         radio.addEventListener('change', () => {
             updateLiveScore(phenomenonEl);
             if (!phenomenonEl.querySelector('.validate-impact-btn')) {
-                createValidationButton(phenomenonEl, "Valider le phénomène et passer au suivant", 'validate-impact-btn', () => {
+                createValidationButton(phenomenonEl, "Valider le phénomène et continuer", 'validate-impact-btn', () => {
                     phenomenonEl.dataset.status = 'done';
                     collectAllData(phenomenonEl);
                     processNextPhenomenon();
@@ -426,31 +432,6 @@ function createValidationButton(phenomenonEl, text, className, onClickAction) {
 }
 
 function updateLiveScore(phenomenonEl) {
-    // ...
-}
-
-function collectAllData(phenomenonEl) {
-    // ...
-}
-
-async function displaySummary() {
-    // ...
-}
-
-function getZone(score) {
-    // ...
-}
-
-async function loadPastAnalyses(userId) {
-    // ...
-}
-
-async function handleChatSubmit() {
-    // ...
-}
-
-// Les fonctions complètes (updateLiveScore, collectAllData, etc.) sont ici pour assurer la fonctionnalité
-function updateLiveScore(phenomenonEl) {
     const scoreDisplay = phenomenonEl.querySelector('.live-score-display span');
     if (!scoreDisplay) return;
     const getScore = (axis, name) => {
@@ -478,17 +459,18 @@ function collectAllData(phenomenonEl) {
        const otherDesc = intelligenceRadio.closest('.wizard-level').querySelector('textarea').value.trim();
        if(otherDesc) intelligenceValue = `Autre : ${otherDesc}`;
     }
+    
     const dataPoint = {
         phenomenonLabel: phenomenonEl.querySelector('.phenomenon-header label').textContent.trim(),
         isms: parseFloat(phenomenonEl.dataset.isms || 0),
-        details: {
-            intensity: phenomenonEl.querySelector('input[name^="intensity_"]:checked')?.value || 'N/A',
-            intensityDescription: phenomenonEl.querySelector('input[name^="intensity_"]:checked')?.closest('.wizard-level').querySelector('textarea').value.trim() || "",
-            scope: phenomenonEl.querySelector('input[name^="scope_"]:checked')?.value || 'N/A',
-            frequency: phenomenonEl.querySelector('input[name^="frequency_"]:checked')?.value || 'N/A',
-            intelligence: intelligenceValue,
-            impact: phenomenonEl.querySelector('input[name^="impact_"]:checked')?.value || 'N/A'
-        }
+        scores: {
+            intensity: scores.intensity[phenomenonEl.querySelector('input[name^="intensity_"]:checked')?.value] || 0,
+            scope: scores.scope[phenomenonEl.querySelector('input[name^="scope_"]:checked')?.value] || 0,
+            frequency: scores.frequency[phenomenonEl.querySelector('input[name^="frequency_"]:checked')?.value] || 0,
+            intelligence: scores.intelligence[phenomenonEl.querySelector('input[name^="intelligence_"]:checked')?.value] || 0,
+            impact: scores.impact[phenomenonEl.querySelector('input[name^="impact_"]:checked')?.value] || 0
+        },
+        userDescription: phenomenonEl.querySelector('input[name^="intensity_"]:checked')?.closest('.wizard-level').querySelector('textarea').value.trim() || ""
     };
     const otherInput = phenomenonEl.querySelector('.other-input');
     if(otherInput && otherInput.value.trim() !== '') {
@@ -504,7 +486,9 @@ async function displaySummary() {
     const igms = summaryData.length > 0 ? summaryData.reduce((acc, item) => acc + item.isms, 0) / summaryData.length : 0;
     
     let summaryHTML = `<h2>Bilan de votre expérience</h2><h3>Indice Global (IGMS) : <strong>${igms.toFixed(3)}</strong></h3>`;
-    let ismsCalcParts = summaryData.map(item => `${item.isms.toFixed(3)} (${item.phenomenonLabel.split('(')[0].trim()})`);
+    let ismsCalcParts = summaryData.map(item => {
+        return `${item.isms.toFixed(3)} (${item.phenomenonLabel.split('(')[0].trim()})`;
+    });
     summaryHTML += `<p class="calculation">IGMS = (${ismsCalcParts.join(' + ')}) / ${summaryData.length}</p>`;
     
     const zone = getZone(igms);
@@ -538,13 +522,14 @@ async function displaySummary() {
         document.getElementById('ai-analysis-box').innerHTML = `<p style='color:red;'>${aiAnalysisText}</p>`;
     }
     
-    const { error: insertError } = await supabaseClient.from('analyses').insert({
+    const { data: analysisData, error } = await supabaseClient.from('analyses').insert({
         user_id: currentUser.id,
         igms: igms,
         summary_data: summaryData,
         ai_analysis: aiAnalysisText
-    });
-    if(insertError) console.error("Erreur de sauvegarde:", insertError);
+    }).select().single();
+
+    if(error) console.error("Erreur de sauvegarde:", error);
     else await loadPastAnalyses(currentUser.id);
     
     currentSummaryData = summaryData;
@@ -582,34 +567,66 @@ async function loadPastAnalyses(userId) {
         });
     }
 }
+
 function displayPastAnalysis(analysis) {
     userDashboard.classList.add('hidden');
+    paranormalForm.classList.add('hidden');
     summaryContainer.innerHTML = '<h2>Rechargement du Bilan...</h2>';
     summaryContainer.classList.remove('hidden');
     chatContainer.classList.add('hidden');
     selectedAnalysisDetails.innerHTML = '';
+    
     summaryData = analysis.summary_data;
-    displaySummary();
+    const igms = analysis.igms;
+    let summaryHTML = `<h2>Bilan de l'expérience du ${new Date(analysis.created_at).toLocaleString('fr-FR')}</h2><h3>Indice Global (IGMS) : <strong>${igms.toFixed(3)}</strong></h3>`;
+    let ismsCalcParts = summaryData.map(item => `${item.isms.toFixed(3)} (${item.phenomenonLabel.split('(')[0].trim()})`);
+    summaryHTML += `<p class="calculation">IGMS = (${ismsCalcParts.join(' + ')}) / ${summaryData.length}</p>`;
+    const zone = getZone(igms);
+    const maxNegativeScore = 4.5;
+    const percent = Math.min(100, (Math.abs(igms) / maxNegativeScore) * 100);
+    summaryHTML += `<div class="thermometer-container"><div class="thermometer-fill" style="width: ${percent}%; background-color: ${zone.color};">${zone.name}</div></div>`;
+    summaryHTML += `<div class="diagnostic-box" style="border-left-color: ${zone.color}; background-color: ${zone.bgColor};"><h3>Diagnostic Global : ${zone.name}</h3><p><strong>Description :</strong> ${zone.diagnostic}</p><p><strong>Recommandations :</strong> ${zone.recommendation}</p></div>`;
+    summaryHTML += `<hr><h2>Analyse Détaillée par l'IA</h2><div id="ai-analysis-box" class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;">${analysis.ai_analysis}</div>`;
+    summaryContainer.innerHTML = summaryHTML;
+    
+    currentSummaryData = summaryData;
+    conversationHistory = [
+        { role: 'user', parts: [{ text: `Voici le bilan qui a été analysé : ${JSON.stringify(summaryData)}` }] },
+        { role: 'model', parts: [{ text: analysis.ai_analysis }] }
+    ];
+    chatMessages.innerHTML = `<div class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;"><p><strong>Assistant IA :</strong> Ceci est votre analyse initiale. Vous pouvez maintenant poser des questions pour l'approfondir.</p></div>`;
+    chatContainer.classList.remove('hidden');
 }
-function addMessageToChat(role, htmlContent) {
+
+function addMessageToChat(role, text) {
     const messageWrapper = document.createElement('div');
     messageWrapper.className = `chat-message ${role}`;
+    const messageContent = document.createElement('div');
     if (role === 'user') {
-        messageWrapper.innerHTML = `<p>${htmlContent}</p>`;
+        messageContent.textContent = text;
+        messageWrapper.style.textAlign = 'right';
+        messageContent.style.display = 'inline-block';
+        messageContent.style.background = '#007bff';
+        messageContent.style.color = 'white';
+        messageContent.style.padding = '10px';
+        messageContent.style.borderRadius = '15px 15px 0 15px';
     } else {
-        messageWrapper.innerHTML = `<div class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;">${htmlContent}</div>`;
+        messageContent.innerHTML = text; // Pour supporter le HTML de l'IA
     }
+    messageWrapper.appendChild(messageContent);
     chatMessages.appendChild(messageWrapper);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
 function updateLastAssistantMessage(htmlContent) {
-    const lastMessage = chatMessages.querySelector('.diagnostic-box:last-of-type');
-    if (lastMessage && lastMessage.textContent === '...') {
-        lastMessage.innerHTML = htmlContent;
+    const lastMessage = chatMessages.lastElementChild;
+    if (lastMessage && lastMessage.querySelector('.diagnostic-box')?.textContent === '...') {
+        lastMessage.querySelector('.diagnostic-box').innerHTML = htmlContent;
     } else {
-        addMessageToChat('assistant', htmlContent);
+        addMessageToChat('assistant', `<div class="diagnostic-box" style="border-left-color: #6f42c1; background-color: #f3f0ff;">${htmlContent}</div>`);
     }
 }
+
 function toggleChatInput(enabled) {
     chatInput.disabled = !enabled;
     chatSendBtn.disabled = !enabled;
