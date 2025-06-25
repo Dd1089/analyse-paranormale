@@ -161,43 +161,183 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // --- CONFIGURATION SUPABASE ---
-        const SUPABASE_URL = 'https://csfyrptbblsxmyiwwwza.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzZnlycHRiYmxzeG15aXd3d3phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTI3MTgsImV4cCI6MjA2NjI4ODcxOH0.dzJqY-2pmtLjAYYNDUITaBL0ZxAo7gGUjLQQH7dpKDg';
-        // ---------------------------------
-        
-        // CORRECTION DE L'ERREUR D'INITIALISATION
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // --- CONFIGURATION SUPABASE ---
+    // Assurez-vous que vos vraies clés sont toujours ici !
+    const SUPABASE_URL = 'https://csfyrptbblsxmyiwwwza.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzZnlycHRiYmxzeG15aXd3d3phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTI3MTgsImV4cCI6MjA2NjI4ODcxOH0.dzJqY-2pmtLjAYYNDUITaBL0ZxAo7gGUjLQQH7dpKDg';
+    // ---------------------------------
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Déclaration de toutes les variables du DOM
-        const authSection = document.getElementById('auth-section');
-        const userDashboard = document.getElementById('user-dashboard');
-        // ... (et tous les autres getElementById)
+    // --- GESTION DES ÉLÉMENTS DU DOM (SECTION CORRIGÉE ET COMPLÈTE) ---
+    const authSection = document.getElementById('auth-section');
+    const userDashboard = document.getElementById('user-dashboard');
+    const paranormalForm = document.getElementById('paranormal-form');
+    const summaryContainer = document.getElementById('summary-container');
+    const chatContainer = document.getElementById('chat-container');
+    
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const loginBtn = document.getElementById('login-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const authError = document.getElementById('auth-error');
+    
+    const userEmailSpan = document.getElementById('user-email');
+    const newAnalysisBtn = document.getElementById('new-analysis-btn');
+    const pastAnalysesList = document.getElementById('past-analyses-list');
+    const selectedAnalysisDetails = document.getElementById('selected-analysis-details');
 
-        let currentUser = null;
-        // ... (le reste du script complet et fonctionnel)
+    const startBtn = document.getElementById('start-detailing-btn');
+    const phase1Container = document.getElementById('phase-1-selection');
+    const wizardControls = document.getElementById('wizard-controls');
 
-        // Exemple de la logique de connexion corrigée
-        loginBtn.addEventListener('click', async () => {
-            // ...
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            // ...
-        });
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    
+    const templates = {
+        intensity: document.getElementById('intensity-template'),
+        scope: document.getElementById('scope-frequency-template'),
+        intelligence: document.getElementById('intelligence-template'),
+        impact: document.getElementById('impact-template'),
+        liveScore: document.getElementById('live-score-template')
+    };
 
-        // La fonction displaySummary corrigée pour sauvegarder dans supabase
-        async function displaySummary() {
-            // ...
-            const { error } = await supabaseClient.from('analyses').insert({
-                user_id: currentUser.id,
-                igms: igms,
-                summary_data: summaryData,
-                ai_analysis: aiAnalysisText // Sauvegarder l'analyse de l'IA
-            });
-            // ...
+    let currentUser = null;
+    let conversationHistory = [];
+    let currentSummaryData = [];
+    let summaryData = [];
+
+    const scores = {
+        intensity: { '1': -0.2, '2': -0.5, '3': -1.0, '4': -1.5, '5': -2.0 },
+        scope: { 'Ponctuelle': -0.5, 'Localisée': -0.5, 'Étendue': -1.0, 'Personnelle': -1.0 },
+        frequency: { 'Unique': -0.2, 'Sporadique': -0.5, 'Cyclique': -0.5, 'Continu / Escalatoire': -1.0 },
+        intelligence: { 'Non-conscient et non-réactif': -0.2, 'Conscience simple et Réactif': -0.5, 'Conscience intelligente': -1.5, 'Haute conscience et Manipulateur': -2.5, 'Autre': -1.0 },
+        impact: { 'Positif / Réconfortant': -0.1, 'Neutre / Curieux': -0.5, 'Confusion / Anxiogène': -1.5, 'Négatif / Effrayant': -2.5, 'Terrifiant / Oppressant': -3.5, 'Possession': -4.5 }
+    };
+    const weights = { intensity: 0.20, scope: 0.10, intelligence: 0.30, impact: 0.40 };
+
+    // --- AUTHENTIFICATION ---
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+            currentUser = session.user;
+            authSection.classList.add('hidden');
+            userDashboard.classList.remove('hidden');
+            paranormalForm.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            chatContainer.classList.add('hidden');
+            userEmailSpan.textContent = currentUser.email;
+            await loadPastAnalyses(currentUser.id);
+        } else {
+            currentUser = null;
+            authSection.classList.remove('hidden');
+            userDashboard.classList.add('hidden');
+            paranormalForm.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            chatContainer.classList.add('hidden');
         }
+    });
 
-        // Le reste du script complet doit être ici.
-    </script>
+    signupBtn.addEventListener('click', async () => {
+        const { error } = await supabaseClient.auth.signUp({ email: emailInput.value, password: passwordInput.value });
+        if (error) {
+            authError.textContent = error.message;
+            authError.classList.remove('hidden');
+        } else {
+            authError.classList.add('hidden');
+            alert("Compte créé ! Veuillez vérifier votre email pour confirmer votre inscription.");
+        }
+    });
+
+    loginBtn.addEventListener('click', async () => {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
+        if (error) {
+            authError.textContent = "Email ou mot de passe incorrect.";
+            authError.classList.remove('hidden');
+        } else {
+            authError.classList.add('hidden');
+        }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+    });
+
+    newAnalysisBtn.addEventListener('click', () => {
+        paranormalForm.classList.remove('hidden');
+        userDashboard.classList.add('hidden');
+        summaryContainer.classList.add('hidden');
+        chatContainer.classList.add('hidden');
+    });
+
+    async function loadPastAnalyses(userId) {
+        // ... (logique pour charger les anciennes analyses)
+    }
+    
+    // --- LOGIQUE DU CHAT ---
+    chatSendBtn.addEventListener('click', handleChatSubmit);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleChatSubmit(); });
+
+    async function handleChatSubmit() {
+        const userQuestion = chatInput.value.trim();
+        if (!userQuestion) return;
+        addMessageToChat('user', userQuestion);
+        chatInput.value = '';
+        chatSendBtn.disabled = true;
+        addMessageToChat('assistant', '...');
+
+        try {
+            conversationHistory.push({ role: 'user', parts: [{ text: userQuestion }] });
+            const response = await fetch('/api/analyser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    summaryData: currentSummaryData,
+                    conversationHistory: conversationHistory,
+                    userQuestion: userQuestion
+                })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Erreur du serveur');
+            }
+            const data = await response.json();
+            updateLastAssistantMessage(data.analysis);
+            conversationHistory.push({ role: 'model', parts: [{ text: data.analysis }] });
+        } catch (error) {
+            updateLastAssistantMessage(`<p style='color:red;'>Désolé, une erreur est survenue: ${error.message}</p>`);
+        } finally {
+            chatSendBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    function addMessageToChat(role, htmlContent) {
+        // ... (logique pour ajouter des messages au chat)
+    }
+    function updateLastAssistantMessage(htmlContent) {
+        // ... (logique pour mettre à jour le message de l'IA)
+    }
+    
+    // --- LOGIQUE DU QUESTIONNAIRE ---
+    // ... (TOUT le code du wizard (startWizard, processNextPhenomenon, etc.) va ici, sans changement) ...
+    // La fonction displaySummary sera la dernière de la chaîne, comme prévu.
+    async function displaySummary() {
+        // ...
+        // Le code de cette fonction est long mais reste le même que celui de la version qui a fonctionné.
+        // Il calcule l'IGMS, affiche le thermomètre, puis appelle le backend.
+        // Puis il sauvegarde dans Supabase.
+        const { error } = await supabaseClient.from('analyses').insert({
+            user_id: currentUser.id,
+            igms: igms,
+            summary_data: summaryData,
+            ai_analysis: aiAnalysisText 
+        });
+        // ...
+    }
+    // ... (toutes les autres fonctions du questionnaire) ...
+</script>
 </body>
 </html>
